@@ -1,34 +1,71 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class VoxelTile : MonoBehaviour {
 
     public float VoxelSize = 0.1f;
-    void Start() {
-        GetVoxelColor(0, 0);
+    public int TileSideSize = 8;
+
+    [HideInInspector] public byte[] ColorsRight;
+    [HideInInspector] public byte[] ColorsForward;
+    [HideInInspector] public byte[] ColorsLeft;
+    [HideInInspector] public byte[] ColorsBack;
+
+    public void CalculateSidesColors() {
+        ColorsRight = new byte[TileSideSize * TileSideSize];
+
+        for (int y = 0; y < TileSideSize; y++) {
+            for (int i = 0; i < TileSideSize; i++) {
+                ColorsRight[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.right);
+                ColorsRight[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.left);
+                ColorsRight[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.forward);
+                ColorsRight[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.back);
+            }
+        }
+        Debug.Log(string.Join(", ", ColorsRight));
     }
     
     void Update() {
         
     }
 
-    private void GetVoxelColor(int verticalLayer, int horizontalLayer)
+    private byte GetVoxelColor(int verticalLayer, int horizontalOffset, Vector3 direction)
     {
         var meshCollider = GetComponentInChildren<MeshCollider>();
 
-        Vector3 rayStart = meshCollider.bounds.min;
-        rayStart.x += 0.5f * VoxelSize;
-        rayStart.y += 0.5f * VoxelSize;
-        rayStart.z -= 0.5f * VoxelSize;
+        float vox = VoxelSize;
+        float half = VoxelSize/2;
 
-        Debug.DrawRay(rayStart, Vector3.forward, Color.blue, 2);
+        Vector3 rayStart;
+        if(direction == Vector3.right) {
+            rayStart = meshCollider.bounds.min + new Vector3(-half, 0, half + horizontalOffset * vox);
+        }
+        else if(direction == Vector3.forward) {
+            rayStart = meshCollider.bounds.min + new Vector3(half + horizontalOffset * vox, 0, -half);
+        }
+        else if(direction == Vector3.left) {
+            rayStart = meshCollider.bounds.max + new Vector3(half, 0, -half - (TileSideSize - horizontalOffset - 1) * vox);
+        }
+        else if(direction == Vector3.back) {
+            rayStart = meshCollider.bounds.max + new Vector3(-half - (TileSideSize - horizontalOffset - 1) * vox, 0, half);
+        }
+        else {
+            throw new ArgumentException("Wrong direction value, should be Vector3.left/right/back/forward", nameof(direction));
+        }
 
-        if(Physics.Raycast(new Ray(rayStart, Vector3.forward), out RaycastHit hit))
+        rayStart.y = meshCollider.bounds.min.y + half + verticalLayer * vox;
+
+        Debug.DrawRay(rayStart, direction*.1f, Color.blue, 2);
+
+        if(Physics.Raycast(new Ray(rayStart, Vector3.forward), out RaycastHit hit, vox))
         {
             Mesh mesh = meshCollider.sharedMesh;
             int hitTriangleVertex = mesh.triangles[hit.triangleIndex * 3];
-            Debug.Log(mesh.uv[hitTriangleVertex]);
+            byte colorIndex = (byte)(mesh.uv[hitTriangleVertex].x * 256);
+            return colorIndex;
         }
+        return 0;
     }
 }
