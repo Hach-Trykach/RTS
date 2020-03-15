@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VoxelTile : MonoBehaviour {
-
+public class VoxelTile : MonoBehaviour
+{
     public float VoxelSize = 0.1f;
     public int TileSideSize = 8;
 
@@ -15,20 +15,22 @@ public class VoxelTile : MonoBehaviour {
 
     public void CalculateSidesColors() {
         ColorsRight = new byte[TileSideSize * TileSideSize];
+        ColorsForward = new byte[TileSideSize * TileSideSize];
+        ColorsLeft = new byte[TileSideSize * TileSideSize];
+        ColorsBack = new byte[TileSideSize * TileSideSize];
 
         for (int y = 0; y < TileSideSize; y++) {
             for (int i = 0; i < TileSideSize; i++) {
                 ColorsRight[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.right);
-                ColorsRight[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.left);
-                ColorsRight[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.forward);
-                ColorsRight[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.back);
+                ColorsForward[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.forward);
+                ColorsLeft[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.left);
+                ColorsBack[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.back);
             }
         }
-        Debug.Log(string.Join(", ", ColorsRight));
-    }
-    
-    void Update() {
-        
+        // Debug.Log(string.Join(", ", ColorsRight));
+        // Debug.Log(string.Join(", ", ColorsForward));
+        // Debug.Log(string.Join(", ", ColorsLeft));
+        // Debug.Log(string.Join(", ", ColorsBack));
     }
 
     private byte GetVoxelColor(int verticalLayer, int horizontalOffset, Vector3 direction)
@@ -57,7 +59,7 @@ public class VoxelTile : MonoBehaviour {
 
         rayStart.y = meshCollider.bounds.min.y + half + verticalLayer * vox;
 
-        Debug.DrawRay(rayStart, direction*.1f, Color.blue, 2);
+        // Debug.DrawRay(rayStart, direction*.1f, Color.blue, 2);
 
         if(Physics.Raycast(new Ray(rayStart, Vector3.forward), out RaycastHit hit, vox))
         {

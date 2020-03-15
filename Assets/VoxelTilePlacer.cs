@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
-
 public class VoxelTilePlacer : MonoBehaviour
 {
     public VoxelTile[] TilePrefabs;
@@ -25,62 +24,67 @@ public class VoxelTilePlacer : MonoBehaviour
             StopAllCoroutines();
 
             foreach (VoxelTile spawnedTile in spawnedTiles) {
-                if(VoxelTile != null) Destroy(spawnedTiles.gameObject);
+                if(spawnedTile != null) Destroy(spawnedTile.gameObject);
             }
             StartCoroutine(Generate());
         }
     }
 
     public IEnumerator Generate() {
-        PlaceTile(MapSize.x /2, MapSize.y / 2);
+        // PlaceTile(MapSize.x /2, MapSize.y / 2);
 
-        while(true) {
-            Vector2Int pos;
-            while(true) {
-                pos = new Vector2Int(Random.Range(1, MapSize.x - 1), Random.Range(1, MapSize.y - 1));
+        for(int x = 1; x < MapSize.x-1; x++) {
+            for(int y = 1; y < MapSize.y-1; y++) {
 
-                if(spawnedTiles[pos.x, pos.y] == null && 
-                    (spawnedTiles[pos.x+1, pos.y] != null || 
-                    spawnedTiles[pos.x-1, pos.y] != null || 
-                    spawnedTiles[pos.x, pos.y+1] != null || 
-                    spawnedTiles[pos.x, pos.y-1] != null))
-                {
-                    break;
-                }
+        // while(true) {
+        //     Vector2Int pos;
+        //     while(true) {
+        //         pos = new Vector2Int(Random.Range(1, MapSize.x - 1), Random.Range(1, MapSize.y - 1));
+
+        //         if(spawnedTiles[pos.x, pos.y] == null && 
+        //             (spawnedTiles[pos.x+1, pos.y] != null || 
+        //             spawnedTiles[pos.x-1, pos.y] != null || 
+        //             spawnedTiles[pos.x, pos.y+1] != null || 
+        //             spawnedTiles[pos.x, pos.y-1] != null))
+        //         {
+        //             break;
+        //         }
+        //     }
+            yield return new WaitForSeconds(0.1f);
+
+            PlaceTile(x, y);
             }
-            yield return new WaitForSeconds(0.2f);
-
-            PlaceTile(pos.x, pos.y);
         }
     }
 
     public void PlaceTile(int x, int y) {
         List<VoxelTile> availableTiles = new List<VoxelTile>();
 
-        foreach(VoxelTile TilePrefab in TilePrefabs) {
-            if(CanAppendTile(spawnedTiles[x-1,y], TilePrefab, Vector3.left) && 
-            CanAppendTile(spawnedTiles[x+1,y], TilePrefab, Vector3.right) && 
-            CanAppendTile(spawnedTiles[x,y-1], TilePrefab, Vector3.back) && 
-            CanAppendTile(spawnedTiles[x,y+1], TilePrefab, Vector3.forward))
+        foreach(VoxelTile tilePrefab in TilePrefabs) {
+            if(CanAppendTile(spawnedTiles[x-1,y], tilePrefab, Vector3.left) && 
+            CanAppendTile(spawnedTiles[x+1,y], tilePrefab, Vector3.right) && 
+            CanAppendTile(spawnedTiles[x,y-1], tilePrefab, Vector3.back) && 
+            CanAppendTile(spawnedTiles[x,y+1], tilePrefab, Vector3.forward))
             {
-                availableTiles.add(TilePrefab);
+                availableTiles.Add(tilePrefab);
             }
         }
 
         if(availableTiles.Count == 0) return;
 
-        VoxelTile selectedTile = availableTiles[Random.Range(0, availableTiles.Count)]; 
-        spawnedTiles[x,y] = Instantiate(selectedTile, new Vector3(x, 0, y)* 0.8f, Quaternion.identity);
+        VoxelTile selectedTile = availableTiles[Random.Range(0, availableTiles.Count)];
+        Vector3 position = new Vector3(x, 0, y) * selectedTile.VoxelSize * selectedTile.TileSideSize;
+        spawnedTiles[x,y] = Instantiate(selectedTile, position, Quaternion.identity);
     }
 
     private bool CanAppendTile(VoxelTile existingTile, VoxelTile tileToAppend, Vector3 direction) {
         if(existingTile == null) return true;
 
         if(direction == Vector3.right) {
-            return Enumerable.SequenceEqual(existingTile.ColorRight, tileToAppend.ColorsLeft);
+            return Enumerable.SequenceEqual(existingTile.ColorsRight, tileToAppend.ColorsLeft);
         }
         else if(direction == Vector3.left) {
-            return Enumerable.SequenceEqual(existingTile.ColorLeft, tileToAppend.ColorsRight);
+            return Enumerable.SequenceEqual(existingTile.ColorsLeft, tileToAppend.ColorsRight);
         }
         else if(direction == Vector3.forward) {
             return Enumerable.SequenceEqual(existingTile.ColorsForward, tileToAppend.ColorsBack);
