@@ -27,10 +27,7 @@ public class VoxelTile : MonoBehaviour
                 ColorsBack[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.back);
             }
         }
-        // Debug.Log(string.Join(", ", ColorsRight));
-        // Debug.Log(string.Join(", ", ColorsForward));
-        // Debug.Log(string.Join(", ", ColorsLeft));
-        // Debug.Log(string.Join(", ", ColorsBack));
+        Debug.Log(string.Join(", ", ColorsRight));
     }
 
     private byte GetVoxelColor(int verticalLayer, int horizontalOffset, Vector3 direction)
@@ -59,13 +56,14 @@ public class VoxelTile : MonoBehaviour
 
         rayStart.y = meshCollider.bounds.min.y + half + verticalLayer * vox;
 
-        // Debug.DrawRay(rayStart, direction*.1f, Color.blue, 2);
+        Debug.DrawRay(rayStart, direction*.1f, Color.blue, 10);
 
         if(Physics.Raycast(new Ray(rayStart, Vector3.forward), out RaycastHit hit, vox))
         {
             Mesh mesh = meshCollider.sharedMesh;
             int hitTriangleVertex = mesh.triangles[hit.triangleIndex * 3];
             byte colorIndex = (byte)(mesh.uv[hitTriangleVertex].x * 256);
+            Debug.Log(colorIndex);
             return colorIndex;
         }
         return 0;
