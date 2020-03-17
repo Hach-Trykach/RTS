@@ -50,7 +50,7 @@ public class VoxelTilePlacer : MonoBehaviour
         //             break;
         //         }
         //     }
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.0f);
 
             PlaceTile(x, y);
             }
@@ -61,10 +61,10 @@ public class VoxelTilePlacer : MonoBehaviour
         List<VoxelTile> availableTiles = new List<VoxelTile>();
 
         foreach(VoxelTile tilePrefab in TilePrefabs) {
-            if(CanAppendTile(spawnedTiles[x-1,y], tilePrefab, Vector3.left) && 
-            CanAppendTile(spawnedTiles[x+1,y], tilePrefab, Vector3.right) && 
-            CanAppendTile(spawnedTiles[x,y-1], tilePrefab, Vector3.back) && 
-            CanAppendTile(spawnedTiles[x,y+1], tilePrefab, Vector3.forward))
+            if (CanAppendTile(spawnedTiles[x-1,y], tilePrefab, Vector3.left) && 
+                CanAppendTile(spawnedTiles[x+1,y], tilePrefab, Vector3.right) && 
+                CanAppendTile(spawnedTiles[x,y-1], tilePrefab, Vector3.back) && 
+                CanAppendTile(spawnedTiles[x,y+1], tilePrefab, Vector3.forward))
             {
                 availableTiles.Add(tilePrefab);
             }

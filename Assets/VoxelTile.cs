@@ -21,10 +21,10 @@ public class VoxelTile : MonoBehaviour
 
         for (int y = 0; y < TileSideSize; y++) {
             for (int i = 0; i < TileSideSize; i++) {
-                ColorsRight[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.right);
-                ColorsForward[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.forward);
-                ColorsLeft[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.left);
-                ColorsBack[y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.back);
+                ColorsRight     [y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.right);
+                ColorsForward   [y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.forward);
+                ColorsLeft      [y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.left);
+                ColorsBack      [y * TileSideSize + i] = GetVoxelColor(y, i, Vector3.back);
             }
         }
         Debug.Log(string.Join(", ", ColorsRight));
